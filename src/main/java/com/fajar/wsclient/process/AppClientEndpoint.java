@@ -39,15 +39,16 @@ public class AppClientEndpoint {
     private CustomMsgHandler customMsgHandler;
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    
-    public void setCustomMsgHandler(CustomMsgHandler h){
+
+    public void setCustomMsgHandler(CustomMsgHandler h) {
         this.customMsgHandler = h;
     }
-    public String getSessionId(){
+
+    public String getSessionId() {
         return thisSession.getId();
     }
 
-    @OnOpen 
+    @OnOpen
     public void onOpen(Session session) {
         thisSession = session;
         logger.info("Connected ... " + session.getId());
@@ -73,29 +74,24 @@ public class AppClientEndpoint {
         }
     }
 
-    @OnMessage 
+    @OnMessage
     public void onMessage(String message, Session session) {
         System.out.println("session: " + session.getClass());
-        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
         try {
 
             logger.info("Received ...." + message);
             Message messagePayload = null;
-            try{
+            try {
                 messagePayload = MessageMapper.getMessage(message);
-            }catch(Exception e){
-                
+            } catch (Exception e) {
+
             }
             if (null != customMsgHandler && messagePayload != null) {
                 customMsgHandler.handleOnMessage(messagePayload, this);
-            }else if(null != customMsgHandler){
-                customMsgHandler.handleOnMessage(new Message("YOU", "SERVER", message, new Date()), this);
-            }
-//            session.getBasicRemote().sendText(message + "TEST");
-//             String userInput = bufferRead.readLine();
-
-//             return userInput;
+            } else if (null != customMsgHandler) {
+                customMsgHandler.handleOnMessage(message, this);
+            } 
         } catch (Exception e) {
 
             throw new RuntimeException(e);
@@ -104,7 +100,7 @@ public class AppClientEndpoint {
 
     }
 
-    @OnClose 
+    @OnClose
     public void onClose(Session session, CloseReason closeReason) {
 
         logger.info(String.format("Session %s close because of %s", session.getId(), closeReason));

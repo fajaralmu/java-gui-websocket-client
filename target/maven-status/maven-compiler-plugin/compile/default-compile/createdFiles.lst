@@ -8,6 +8,7 @@ com\fajar\wsclient\process\ThreadUtil.class
 com\fajar\wsclient\Appl.class
 com\fajar\wsclient\dto\MessageMapper.class
 com\fajar\wsclient\gui\MainForm$4.class
+com\fajar\wsclient\gui\MainForm$6.class
 com\fajar\wsclient\gui\MainForm.class
 com\fajar\wsclient\gui\MainForm$5.class
 com\fajar\wsclient\dto\Message$MessageBuilder.class

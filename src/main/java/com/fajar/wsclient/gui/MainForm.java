@@ -42,6 +42,7 @@ public class MainForm extends javax.swing.JFrame {
         txtResponse = new javax.swing.JTextArea();
         txtSessionId = new javax.swing.JLabel();
         txtMessageTo = new javax.swing.JTextField();
+        btnClearMsg = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
@@ -71,6 +72,13 @@ public class MainForm extends javax.swing.JFrame {
 
         txtMessageTo.setText("Message To ");
 
+        btnClearMsg.setText("Clear");
+        btnClearMsg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearMsgActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -78,18 +86,19 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 719, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtSessionId, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(111, 111, 111)
-                        .addComponent(btnConnect))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jScrollPane2)
+                    .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(btnConnect)
+                            .addGap(18, 18, 18)
+                            .addComponent(btnClearMsg))
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGap(18, 18, 18)
-                            .addComponent(btnSend)))
-                    .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(39, Short.MAX_VALUE))
+                            .addComponent(btnSend))))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -97,16 +106,18 @@ public class MainForm extends javax.swing.JFrame {
                 .addGap(16, 16, 16)
                 .addComponent(txtSessionId)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnConnect)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnConnect)
+                    .addComponent(btnClearMsg))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSend))
-                .addGap(49, 49, 49))
+                .addContainerGap())
         );
 
         pack();
@@ -114,47 +125,33 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
-        // TODO add your handling code here:
-        try{
+
+        try {
             connect();
             btnConnect.setEnabled(false);
-        }catch(Exception e){
-            
+        } catch (Exception e) {
+
         }
 
     }//GEN-LAST:event_btnConnectActionPerformed
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        
-        if(null == appClientEndpoint){
+
+        if (null == appClientEndpoint) {
             return;
         }
-        String destination = txtMessageTo.getText();
-        String message = txtInput.getText();
-        appClientEndpoint.sendMessage(message, destination);
+        sendMessage();
     }//GEN-LAST:event_btnSendActionPerformed
+
+    
+
+    private void btnClearMsgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearMsgActionPerformed
+        txtResponse.setText("");
+    }//GEN-LAST:event_btnClearMsgActionPerformed
 
     private void connect() {
         appClientEndpoint = new AppClientEndpoint();
-        appClientEndpoint.setCustomMsgHandler(new CustomMsgHandler() {
-            @Override
-            public void handleOnMessage(Object payload, AppClientEndpoint client) {
-                if(!(payload instanceof Message)){
-                    
-                    return;
-                }
-                Message message = (Message) payload;
-                
-                txtSessionId.setText("SESSION ID: "+client.getSessionId()); 
-                System.out.println("handleOnMessage:" + message);
-                
-                String oldText = txtResponse.getText();
-                String msgContent = "From: "+message.getMessageFrom();
-                msgContent+="\n"+message.getDate();
-                msgContent+="\n"+message.getMessage();
-                txtResponse.setText(oldText+"\n"+String.valueOf(msgContent));
-            }
-        });
+        appClientEndpoint.setCustomMsgHandler(getMessageHandler());
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
@@ -201,6 +198,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClearMsg;
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnSend;
     private javax.swing.JScrollPane jScrollPane1;
@@ -210,4 +208,49 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JTextArea txtResponse;
     private javax.swing.JLabel txtSessionId;
     // End of variables declaration//GEN-END:variables
+
+    private void updateSessionId(Object rawMessage) {
+        txtSessionId.setText("SESSION ID: " + rawMessage.toString().replace("[ID]", ""));
+        txtResponse.setText("Your ID:" + rawMessage);
+    }
+
+    private void updateMessage(Object payload) {
+        Message message = (Message) payload;
+
+        String oldText = txtResponse.getText();
+        String msgContent = "From: " + message.getMessageFrom();
+        msgContent += "\n" + message.getDate();
+        msgContent += "\n" + message.getMessage();
+        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent));
+    }
+
+    private void handleMessage(Object payload, AppClientEndpoint client) {
+        System.out.println("handleOnMessage:" + payload);
+
+        if (!(payload instanceof Message)) {
+            //Recently Connected
+            if (payload instanceof String && payload.toString().startsWith("[ID]")) {
+                updateSessionId(payload);
+            }
+            return;
+        }
+        
+        updateMessage(payload);
+    }
+
+    private CustomMsgHandler getMessageHandler() {
+        return new CustomMsgHandler() {
+            @Override
+            public void handleOnMessage(Object payload, AppClientEndpoint client) {
+                handleMessage(payload, client);
+            }
+        };
+    }
+    
+    private void sendMessage() {
+        String destination = txtMessageTo.getText();
+        String message = txtInput.getText();
+        appClientEndpoint.sendMessage(message, destination);
+        txtInput.setText("");
+    }
 }
