@@ -45,6 +45,7 @@ public class MainForm extends javax.swing.JFrame {
         txtMessageTo = new javax.swing.JTextField();
         btnClearMsg = new javax.swing.JButton();
         btnDIsconnect = new javax.swing.JButton();
+        txtWSURL = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
@@ -89,6 +90,13 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        txtWSURL.setText("localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket");
+        txtWSURL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtWSURLActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -96,21 +104,25 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtSessionId, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(btnConnect)
-                            .addGap(18, 18, 18)
-                            .addComponent(btnClearMsg)
-                            .addGap(18, 18, 18)
-                            .addComponent(btnDIsconnect))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(btnSend)))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(62, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSessionId, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnSend))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(62, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnConnect)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnClearMsg)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnDIsconnect)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtWSURL, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+                        .addGap(61, 61, 61))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -121,7 +133,8 @@ public class MainForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConnect)
                     .addComponent(btnClearMsg)
-                    .addComponent(btnDIsconnect))
+                    .addComponent(btnDIsconnect)
+                    .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -138,7 +151,9 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
-
+        // ALTERNATIVE: ws://localhost:8080/dormactivity/realtime-app/{NUMERIC}/{UNIQUE_ID}/websocket
+        // AND :ws://localhost:8025/websockets/chat
+        // example: localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket
         try {
             connect();
             btnConnect.setEnabled(false);
@@ -172,9 +187,15 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDIsconnectActionPerformed
 
+    private void txtWSURLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtWSURLActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtWSURLActionPerformed
+
     private void connect() {
-        appClientEndpoint = new AppClientEndpoint();
+        appClientEndpoint = new AppClientEndpoint(txtWSURL.getText());
         appClientEndpoint.setCustomMsgHandler(getMessageHandler());
+        
+        System.out.println("connecting to: "+txtWSURL.getText());
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
@@ -231,6 +252,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JTextField txtMessageTo;
     private javax.swing.JTextArea txtResponse;
     private javax.swing.JLabel txtSessionId;
+    private javax.swing.JTextField txtWSURL;
     // End of variables declaration//GEN-END:variables
 
     private void updateSessionId(Object rawMessage) {
@@ -249,6 +271,15 @@ public class MainForm extends javax.swing.JFrame {
         msgContent += "\n" + message.getMessage();
         txtResponse.setText(oldText + "\n" + String.valueOf(msgContent));
     }
+    
+     private void showPlainMessage(Object payload) {
+        String message = payload.toString();
+
+        String oldText = txtResponse.getText();
+        String msgContent = "PLAIN RESPONSE";
+        msgContent += "\n" + message;
+        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent));
+    }
 
     private void handleMessage(Object payload, AppClientEndpoint client) {
         System.out.println("handleOnMessage:" + payload);
@@ -257,6 +288,8 @@ public class MainForm extends javax.swing.JFrame {
             //Recently Connected
             if (payload instanceof String && payload.toString().startsWith("[ID]")) {
                 updateSessionId(payload);
+            }else{
+                showPlainMessage(payload);
             }
             return;
         }

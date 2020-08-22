@@ -1,6 +1,7 @@
 com\fajar\wsclient\handler\CustomMsgHandler.class
 com\fajar\wsclient\gui\MainForm$2.class
 com\fajar\wsclient\gui\MainForm$1.class
+com\fajar\wsclient\gui\MainForm$8.class
 com\fajar\wsclient\gui\MainForm$3.class
 com\fajar\wsclient\process\AppClientEndpoint.class
 com\fajar\wsclient\gui\MainForm$7.class
