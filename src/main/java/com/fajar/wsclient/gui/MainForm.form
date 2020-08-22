@@ -27,7 +27,6 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" min="-2" pref="719" max="-2" attributes="0"/>
                   <Component id="txtSessionId" alignment="0" min="-2" pref="290" max="-2" attributes="0"/>
                   <Component id="txtMessageTo" alignment="0" min="-2" pref="215" max="-2" attributes="0"/>
                   <Group type="103" alignment="0" groupAlignment="1" attributes="0">
@@ -42,8 +41,9 @@
                           <Component id="btnSend" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
+                  <Component id="jScrollPane2" alignment="0" min="-2" pref="457" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="48" max="32767" attributes="0"/>
+              <EmptySpace pref="62" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
