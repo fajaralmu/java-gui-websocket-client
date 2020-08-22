@@ -17,6 +17,7 @@ import com.fajar.wsclient.process.ThreadUtil;
 public class MainForm extends javax.swing.JFrame {
 
     private AppClientEndpoint appClientEndpoint;
+    private String clientID; 
 
     /**
      * Creates new form Main
@@ -210,7 +211,9 @@ public class MainForm extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void updateSessionId(Object rawMessage) {
-        txtSessionId.setText("SESSION ID: " + rawMessage.toString().replace("[ID]", ""));
+        String pureID =  rawMessage.toString().replace("[ID]", "");
+        txtSessionId.setText("SESSION ID: " +pureID);
+        clientID = pureID;
         txtResponse.setText("Your ID:" + rawMessage);
     }
 
