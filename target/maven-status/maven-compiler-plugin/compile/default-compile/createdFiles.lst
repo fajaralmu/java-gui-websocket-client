@@ -3,6 +3,7 @@ com\fajar\wsclient\gui\MainForm$2.class
 com\fajar\wsclient\gui\MainForm$1.class
 com\fajar\wsclient\gui\MainForm$3.class
 com\fajar\wsclient\process\AppClientEndpoint.class
+com\fajar\wsclient\gui\MainForm$7.class
 com\fajar\wsclient\dto\Message.class
 com\fajar\wsclient\process\ThreadUtil.class
 com\fajar\wsclient\Appl.class

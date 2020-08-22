@@ -44,6 +44,7 @@ public class MainForm extends javax.swing.JFrame {
         txtSessionId = new javax.swing.JLabel();
         txtMessageTo = new javax.swing.JTextField();
         btnClearMsg = new javax.swing.JButton();
+        btnDIsconnect = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
@@ -80,6 +81,14 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        btnDIsconnect.setText("Disconnect");
+        btnDIsconnect.setEnabled(false);
+        btnDIsconnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDIsconnectActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -93,7 +102,9 @@ public class MainForm extends javax.swing.JFrame {
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(btnConnect)
                             .addGap(18, 18, 18)
-                            .addComponent(btnClearMsg))
+                            .addComponent(btnClearMsg)
+                            .addGap(18, 18, 18)
+                            .addComponent(btnDIsconnect))
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGap(18, 18, 18)
@@ -109,7 +120,8 @@ public class MainForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConnect)
-                    .addComponent(btnClearMsg))
+                    .addComponent(btnClearMsg)
+                    .addComponent(btnDIsconnect))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -130,6 +142,8 @@ public class MainForm extends javax.swing.JFrame {
         try {
             connect();
             btnConnect.setEnabled(false);
+            btnDIsconnect.setEnabled(true);
+            
         } catch (Exception e) {
 
         }
@@ -149,6 +163,14 @@ public class MainForm extends javax.swing.JFrame {
     private void btnClearMsgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearMsgActionPerformed
         txtResponse.setText("");
     }//GEN-LAST:event_btnClearMsgActionPerformed
+
+    private void btnDIsconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDIsconnectActionPerformed
+        
+        if(null != appClientEndpoint){
+            appClientEndpoint.disconnect();
+            btnConnect.setEnabled(true);
+        }
+    }//GEN-LAST:event_btnDIsconnectActionPerformed
 
     private void connect() {
         appClientEndpoint = new AppClientEndpoint();
@@ -201,6 +223,7 @@ public class MainForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClearMsg;
     private javax.swing.JButton btnConnect;
+    private javax.swing.JButton btnDIsconnect;
     private javax.swing.JButton btnSend;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

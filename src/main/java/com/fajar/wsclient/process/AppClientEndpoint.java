@@ -128,4 +128,12 @@ public class AppClientEndpoint {
 
     }
 
+    public void disconnect() {
+        try {
+            thisSession.getBasicRemote().sendText("quit");
+        } catch (IOException ex) {
+            Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }

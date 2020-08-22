@@ -34,6 +34,8 @@
                           <Component id="btnConnect" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="btnClearMsg" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="btnDIsconnect" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="txtInput" min="-2" pref="215" max="-2" attributes="0"/>
@@ -56,6 +58,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnConnect" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnClearMsg" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnDIsconnect" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jScrollPane2" pref="195" max="32767" attributes="0"/>
@@ -130,6 +133,15 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearMsgActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnDIsconnect">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Disconnect"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDIsconnectActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
