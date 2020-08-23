@@ -12,6 +12,7 @@ import com.fajar.wsclient.process.AppClientEndpoint;
 import com.fajar.wsclient.process.StringUtil;
 import com.fajar.wsclient.process.ThreadUtil;
 import java.awt.Rectangle;
+import java.util.Date;
 import javax.swing.JCheckBox;
 
 /**
@@ -182,7 +183,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btnDIsconnect)
                     .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -272,10 +273,10 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtSessionIdActionPerformed
 
     /**
-     * Websocket URL ALTERNATIVE
+     * Web socket URL ALTERNATIVE
      * ws://localhost:8080/dormactivity/realtime-app/{NUMERIC}/{UNIQUE_ID}/websocket
      * AND ws://localhost:8025/websockets/chat example
-     * localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket
+     * ws://localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket
      */
     private void register() {
         String wsURL = txtWSURL.getText();
@@ -284,8 +285,7 @@ public class MainForm extends javax.swing.JFrame {
             String sessionId = StringUtil.randomUUID();
             wsURL = wsURL + "/" + StringUtil.randomNumber() + "/" + sessionId + "/websocket";
 
-            appClientEndpoint = new AppClientEndpoint(wsURL);
-            appClientEndpoint.withSockJS(true, sessionId);
+            appClientEndpoint = new AppClientEndpoint(wsURL,true, sessionId); 
 
             updateSessionId(sessionId);
         } else {
@@ -370,7 +370,7 @@ public class MainForm extends javax.swing.JFrame {
         String msgContent = "\n==============================\nFrom: " + message.getMessageFrom();
         msgContent += "\n" + message.getDate();
         msgContent += "\n" + message.getMessage();
-        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n==============================\n");
+        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
     }
 
     private boolean isWithSockJs() {
@@ -421,6 +421,12 @@ public class MainForm extends javax.swing.JFrame {
         String destination = txtMessageTo.getText();
         String message = txtInput.getText();
         appClientEndpoint.sendMessage(message, destination);
+        showUserMessage(message, destination);
         txtInput.setText("");
+    }
+    
+    private void showUserMessage(String rawMessage, String destination){
+        Message message = new Message(destination, "You", rawMessage, new Date());
+        this.showMessage(message);
     }
 }

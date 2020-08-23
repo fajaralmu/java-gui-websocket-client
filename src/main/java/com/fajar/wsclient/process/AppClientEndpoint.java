@@ -9,15 +9,12 @@ import com.fajar.wsclient.dto.Message;
 import com.fajar.wsclient.dto.MessageMapper;
 import com.fajar.wsclient.handler.CustomMsgHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
-import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -33,22 +30,26 @@ import org.glassfish.tyrus.client.ClientManager;
 public class AppClientEndpoint {
     //extends Endpoint
 
-    private static CountDownLatch latch;
     private Session thisSession;
     private CustomMsgHandler customMsgHandler;
+
+    private final String sockJsId;
+    private static CountDownLatch latch;
     private final String wsURL;
-    private String sockJsId;
-    private boolean withSockJS = false;
+    private final boolean withSockJS;
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public AppClientEndpoint(String wsURL) {
         this.wsURL = wsURL;
+        this.sockJsId = null;
+        this.withSockJS = false;
     }
 
-    public void withSockJS(boolean b, String sockJsId) {
-        withSockJS = b;
+    public AppClientEndpoint(String wsURL, boolean withSockJs, String sockJsId) {
+        this.wsURL = wsURL;
         this.sockJsId = sockJsId;
+        this.withSockJS = withSockJs;
     }
 
     public void setCustomMsgHandler(CustomMsgHandler h) {
@@ -72,13 +73,12 @@ public class AppClientEndpoint {
     public void connect() {
         System.out.println("Connecting...");
         String template = "[\"CONNECT\\naccept-version:1.1,1.0\\nheart-beat:10000,10000\\n\\n\\u0000\"]";
-        sessionSend(template);
-
+        sessionSend(template); 
     }
 
     /**
      * for SockJS only
-     * 
+     *
      */
     public void subscribe() {
         if (!withSockJS) {
@@ -86,8 +86,8 @@ public class AppClientEndpoint {
             MyDialog.info("Subscribe is for SockJS!");
             return;
         }
-        System.out.println("Subscribe wsClientId: " + sockJsId); 
-        String template = "[\"SUBSCRIBE\\nid:sub-"+StringUtil.randomNumber(100, 900)+"\\ndestination:/wsResp/chats/" + sockJsId + "\\n\\n\\u0000\"]";
+        System.out.println("Subscribe wsClientId: " + sockJsId);
+        String template = "[\"SUBSCRIBE\\nid:sub-" + StringUtil.randomNumber(100, 900) + "\\ndestination:/wsResp/chats/" + sockJsId + "\\n\\n\\u0000\"]";
         sessionSend(template);
 
     }
@@ -122,7 +122,8 @@ public class AppClientEndpoint {
     private void sessionSend(String text) {
         try {
             thisSession.getBasicRemote().sendText(text);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
+            MyDialog.error(ex.getMessage());
             Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -132,18 +133,13 @@ public class AppClientEndpoint {
         thisSession = session;
         logger.info("Connected : " + session.getId());
 
-        try {
-//            session.getBasicRemote().sendText("start");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @OnError
     public void onError(Session session, Throwable thr) {
         System.out.println("On Error:");
         thr.printStackTrace();
+        MyDialog.error(thr.getMessage());
 //        super.onError(session, thr); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -190,8 +186,8 @@ public class AppClientEndpoint {
 
             latch.await();
 
-        } catch (DeploymentException | URISyntaxException | InterruptedException e) {
-
+        } catch (Exception e) {
+            MyDialog.error(e.getMessage());
             throw new RuntimeException(e);
 
         }
@@ -203,11 +199,6 @@ public class AppClientEndpoint {
 
     }
 
-//    @Override
-//    public void onOpen(Session arg0, EndpointConfig arg1) {
-//        System.out.println("On Open: " + arg1.getUserProperties());
-//        this.onOpen(arg0);
-//    }
     public boolean isWithSockJs() {
         return withSockJS;
     }

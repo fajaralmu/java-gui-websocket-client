@@ -19,7 +19,11 @@ public class MyDialog {
     }
 
     public static void info(String message) {
-        JOptionPane.showMessageDialog(null, message);
+        JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    static void error(String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
     
 }
