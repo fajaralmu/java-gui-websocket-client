@@ -102,7 +102,7 @@ public class AppClientEndpoint {
         }
 
         System.out.println("payload: " + payload);
-        String sendingTemplate = "[\"MESSAGE\\ndestination:/app/chat\\ncontent-type:application/json;charset=UTF-8\\nsubscription:sub-0\\nmessage-id:1itomv18-933\\n\\n" + payload + "\\u0000\"]";
+        String sendingTemplate = "[\"MESSAGE\\ndestination:/app/guichat\\ncontent-type:application/json;charset=UTF-8\\nsubscription:sub-0\\nmessage-id:1itomv18-933\\n\\n" + payload + "\\u0000\"]";
         System.out.println("sendingTemplate: " + sendingTemplate);
         return sendingTemplate;
     }

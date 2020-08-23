@@ -2,7 +2,6 @@ package com.fajar.wsclient.dto;
 
 import java.util.Date;
 
-import javax.websocket.Session;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +32,7 @@ public class MessageMapper {
 
     public static String constructMessage(String id, String destination, String msg) {
 
-        Message message = new Message(destination,id, msg, new Date());
+        Message message = new Message(destination, id, msg, new Date());
         return messageAsString(message);
 
     }
