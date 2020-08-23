@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.DeploymentException;
-import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -58,19 +57,6 @@ public class AppClientEndpoint {
         return thisSession.getId();
     }
 
-    @OnOpen
-    public void onOpen(Session session) {
-        thisSession = session;
-        logger.info("Connected ... " + session.getId());
-
-        try {
-//            session.getBasicRemote().sendText("start");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
     static String normalize(String payload) {
         payload = payload.substring(1);
         payload = payload.substring(0, payload.length() - 1);
@@ -88,11 +74,18 @@ public class AppClientEndpoint {
 
     }
 
-    public void subsribe() {
-
-        System.out.println("Subscribe");
+    /**
+     * for SockJS only
+     * @param wsClientId 
+     */
+    public void subscribe(String wsClientId) {
+        if(!withSockJS){
+            System.out.println("Not Sock JS");
+            return;
+        }
+        System.out.println("Subscribe wsClientId: "+wsClientId);
         try {
-            String template = "[\"SUBSCRIBE\\nid:sub-0\\ndestination:/wsResp/chats\\n\\n\\u0000\"]";
+            String template = "[\"SUBSCRIBE\\nid:sub-0\\ndestination:/wsResp/chats/"+wsClientId+"\\n\\n\\u0000\"]";
             thisSession.getBasicRemote().sendText(template);
         } catch (IOException ex) {
             Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
@@ -128,6 +121,19 @@ public class AppClientEndpoint {
         }
     }
 
+    @OnOpen
+    public void onOpen(Session session) {
+        thisSession = session;
+        logger.info("Connected : " + session.getId());
+
+        try {
+//            session.getBasicRemote().sendText("start");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     @OnError
     public void onError(Session session, Throwable thr) {
         System.out.println("On Error:");
@@ -136,12 +142,10 @@ public class AppClientEndpoint {
     }
 
     @OnMessage
-    public void onMessage(  String message, Session session) {
-        System.out.println("ON MESSAGE");
+    public void onMessage(String message, Session session) {
+        logger.info("Received Message: " + message);
 
         try {
-
-            logger.info("Received ...." + message);
             Message messagePayload = null;
             try {
                 messagePayload = MessageMapper.getMessage(message);
@@ -164,8 +168,7 @@ public class AppClientEndpoint {
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
 
-        logger.info(String.format("Session %s close because of %s", session.getId(), closeReason));
-
+        logger.info(String.format("Session %s close because of %s", session.getId(), closeReason)); 
         latch.countDown();
 
     }
@@ -185,8 +188,7 @@ public class AppClientEndpoint {
 
             throw new RuntimeException(e);
 
-        }
-
+        } 
     }
 
     public void disconnect() {
@@ -202,5 +204,4 @@ public class AppClientEndpoint {
 //        System.out.println("On Open: " + arg1.getUserProperties());
 //        this.onOpen(arg0);
 //    }
-
 }

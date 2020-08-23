@@ -8,7 +8,9 @@ package com.fajar.wsclient.gui;
 import com.fajar.wsclient.dto.Message;
 import com.fajar.wsclient.handler.CustomMsgHandler;
 import com.fajar.wsclient.process.AppClientEndpoint;
+import com.fajar.wsclient.process.StringUtil;
 import com.fajar.wsclient.process.ThreadUtil;
+import java.util.UUID;
 import javax.swing.JCheckBox;
 
 /**
@@ -18,7 +20,7 @@ import javax.swing.JCheckBox;
 public class MainForm extends javax.swing.JFrame {
 
     private AppClientEndpoint appClientEndpoint;
-    private String clientID;
+    private String wsClientId;
 
     /**
      * Creates new form Main
@@ -36,32 +38,33 @@ public class MainForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnConnect = new javax.swing.JButton();
+        btnRegister = new javax.swing.JButton();
         txtInput = new javax.swing.JTextField();
         btnSend = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtResponse = new javax.swing.JTextArea();
-        txtSessionId = new javax.swing.JLabel();
         txtMessageTo = new javax.swing.JTextField();
         btnClearMsg = new javax.swing.JButton();
         btnDIsconnect = new javax.swing.JButton();
         txtWSURL = new javax.swing.JTextField();
         cbSockJS = new javax.swing.JCheckBox();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnConnect = new javax.swing.JButton();
+        btnSubscribe = new javax.swing.JButton();
+        txtSessionId = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
 
-        btnConnect.setText("Connect");
-        btnConnect.addActionListener(new java.awt.event.ActionListener() {
+        btnRegister.setText("Register");
+        btnRegister.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConnectActionPerformed(evt);
+                btnRegisterActionPerformed(evt);
             }
         });
 
         btnSend.setText("Send");
+        btnSend.setEnabled(false);
         btnSend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSendActionPerformed(evt);
@@ -73,9 +76,6 @@ public class MainForm extends javax.swing.JFrame {
         jScrollPane1.setViewportView(txtResponse);
 
         jScrollPane2.setViewportView(jScrollPane1);
-
-        txtSessionId.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        txtSessionId.setText("SessionID : -");
 
         txtMessageTo.setText("Message To ");
 
@@ -94,7 +94,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        txtWSURL.setText("localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket");
+        txtWSURL.setText("localhost:8080/dormactivity/realtime-app");
         txtWSURL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtWSURLActionPerformed(evt);
@@ -108,17 +108,26 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Connect");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnConnect.setText("Connect");
+        btnConnect.setEnabled(false);
+        btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnConnectActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Subscribe");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnSubscribe.setText("Subscribe");
+        btnSubscribe.setEnabled(false);
+        btnSubscribe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnSubscribeActionPerformed(evt);
+            }
+        });
+
+        txtSessionId.setText("SESSION ID: - ");
+        txtSessionId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSessionIdActionPerformed(evt);
             }
         });
 
@@ -131,7 +140,6 @@ public class MainForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtSessionId, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -145,42 +153,45 @@ public class MainForm extends javax.swing.JFrame {
                                         .addComponent(cbSockJS)))
                                 .addGap(35, 35, 35)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jButton1)
-                                    .addComponent(jButton2))))
+                                    .addComponent(btnConnect)
+                                    .addComponent(btnSubscribe))))
                         .addContainerGap(62, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnConnect)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnClearMsg)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnDIsconnect)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtSessionId, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(btnRegister)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnClearMsg)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnDIsconnect)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
                         .addGap(61, 61, 61))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(txtSessionId)
+                .addGap(12, 12, 12)
+                .addComponent(txtSessionId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnConnect)
+                    .addComponent(btnRegister)
                     .addComponent(btnClearMsg)
                     .addComponent(btnDIsconnect)
                     .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbSockJS)
-                    .addComponent(jButton1))
+                    .addComponent(btnConnect))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSend)
-                    .addComponent(jButton2))
+                    .addComponent(btnSubscribe))
                 .addContainerGap())
         );
 
@@ -188,20 +199,20 @@ public class MainForm extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
+    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
         // ALTERNATIVE: ws://localhost:8080/dormactivity/realtime-app/{NUMERIC}/{UNIQUE_ID}/websocket
         // AND :ws://localhost:8025/websockets/chat
         // example: localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket
         try {
-            connect();
-            btnConnect.setEnabled(false);
+            register();
+            btnRegister.setEnabled(false);
             btnDIsconnect.setEnabled(true);
-
+            btnConnect.setEnabled(true);
         } catch (Exception e) {
 
         }
 
-    }//GEN-LAST:event_btnConnectActionPerformed
+    }//GEN-LAST:event_btnRegisterActionPerformed
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
 
@@ -220,7 +231,7 @@ public class MainForm extends javax.swing.JFrame {
 
         if (null != appClientEndpoint) {
             appClientEndpoint.disconnect();
-            btnConnect.setEnabled(true);
+            btnRegister.setEnabled(true);
         }
     }//GEN-LAST:event_btnDIsconnectActionPerformed
 
@@ -236,30 +247,44 @@ public class MainForm extends javax.swing.JFrame {
         appClientEndpoint.withSockJS(checked);
     }//GEN-LAST:event_cbSockJSActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
                 appClientEndpoint.connect();
+                btnSubscribe.setEnabled(true);
             }
         });
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnConnectActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnSubscribeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubscribeActionPerformed
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
-                appClientEndpoint.subsribe();
+                appClientEndpoint.subscribe(wsClientId);
+                btnSend.setEnabled(true);
             }
         });
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnSubscribeActionPerformed
 
-    private void connect() {
-        appClientEndpoint = new AppClientEndpoint(txtWSURL.getText());
+    private void txtSessionIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSessionIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSessionIdActionPerformed
+
+    private void register() {
+        String wsURL = txtWSURL.getText();
+
+        if (cbSockJS.isSelected()) {
+            String sessionId = UUID.randomUUID().toString();
+            wsURL = wsURL + "/" + StringUtil.randomNumber() + "/" + sessionId + "/websocket";
+            updateSessionId(sessionId);
+        }
+
+        appClientEndpoint = new AppClientEndpoint(wsURL);
         appClientEndpoint.setCustomMsgHandler(getMessageHandler());
         appClientEndpoint.withSockJS(cbSockJS.isSelected());
 
-        System.out.println("connecting to: " + txtWSURL.getText());
+        System.out.println("connecting to: " + wsURL);
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
@@ -309,23 +334,23 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnClearMsg;
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnDIsconnect;
+    private javax.swing.JButton btnRegister;
     private javax.swing.JButton btnSend;
+    private javax.swing.JButton btnSubscribe;
     private javax.swing.JCheckBox cbSockJS;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField txtInput;
     private javax.swing.JTextField txtMessageTo;
     private javax.swing.JTextArea txtResponse;
-    private javax.swing.JLabel txtSessionId;
+    private javax.swing.JTextField txtSessionId;
     private javax.swing.JTextField txtWSURL;
     // End of variables declaration//GEN-END:variables
 
     private void updateSessionId(Object rawMessage) {
         String pureID = rawMessage.toString().replace("[ID]", "");
         txtSessionId.setText("SESSION ID: " + pureID);
-        clientID = pureID;
+        wsClientId = pureID;
         txtResponse.setText("Your ID:" + rawMessage);
     }
 
@@ -343,9 +368,10 @@ public class MainForm extends javax.swing.JFrame {
         String message = payload.toString();
 
         String oldText = txtResponse.getText();
-        String msgContent = "PLAIN RESPONSE";
+        String msgContent = "---------------------------------------\n";
+        msgContent += "PLAIN RESPONSE";
         msgContent += "\n" + message;
-        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent));
+        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
     }
 
     private void handleMessage(Object payload, AppClientEndpoint client) {
@@ -365,12 +391,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     private CustomMsgHandler getMessageHandler() {
-        return new CustomMsgHandler() {
-            @Override
-            public void handleOnMessage(Object payload, AppClientEndpoint client) {
-                handleMessage(payload, client);
-            }
-        };
+        return this::handleMessage;
     }
 
     private void sendMessage() {

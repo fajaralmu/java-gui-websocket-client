@@ -1,6 +1,5 @@
 package com.fajar.wsclient.dto;
 
-import java.io.IOException;
 import java.util.Date;
 
 import javax.websocket.Session;
