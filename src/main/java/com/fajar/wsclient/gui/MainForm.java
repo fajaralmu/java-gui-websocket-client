@@ -9,6 +9,7 @@ import com.fajar.wsclient.dto.Message;
 import com.fajar.wsclient.handler.CustomMsgHandler;
 import com.fajar.wsclient.process.AppClientEndpoint;
 import com.fajar.wsclient.process.ThreadUtil;
+import javax.swing.JCheckBox;
 
 /**
  *
@@ -17,7 +18,7 @@ import com.fajar.wsclient.process.ThreadUtil;
 public class MainForm extends javax.swing.JFrame {
 
     private AppClientEndpoint appClientEndpoint;
-    private String clientID; 
+    private String clientID;
 
     /**
      * Creates new form Main
@@ -46,6 +47,9 @@ public class MainForm extends javax.swing.JFrame {
         btnClearMsg = new javax.swing.JButton();
         btnDIsconnect = new javax.swing.JButton();
         txtWSURL = new javax.swing.JTextField();
+        cbSockJS = new javax.swing.JCheckBox();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
@@ -97,6 +101,27 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        cbSockJS.setText("SockJS");
+        cbSockJS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbSockJSActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("Connect");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Subscribe");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -107,12 +132,21 @@ public class MainForm extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtSessionId, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnSend))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(btnSend))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(cbSockJS)))
+                                .addGap(35, 35, 35)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jButton1)
+                                    .addComponent(jButton2))))
                         .addContainerGap(62, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnConnect)
@@ -121,7 +155,7 @@ public class MainForm extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(btnDIsconnect)
                         .addGap(18, 18, 18)
-                        .addComponent(txtWSURL, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+                        .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                         .addGap(61, 61, 61))))
         );
         layout.setVerticalGroup(
@@ -136,13 +170,17 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btnDIsconnect)
                     .addComponent(txtWSURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbSockJS)
+                    .addComponent(jButton1))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSend))
+                    .addComponent(btnSend)
+                    .addComponent(jButton2))
                 .addContainerGap())
         );
 
@@ -158,7 +196,7 @@ public class MainForm extends javax.swing.JFrame {
             connect();
             btnConnect.setEnabled(false);
             btnDIsconnect.setEnabled(true);
-            
+
         } catch (Exception e) {
 
         }
@@ -173,15 +211,14 @@ public class MainForm extends javax.swing.JFrame {
         sendMessage();
     }//GEN-LAST:event_btnSendActionPerformed
 
-    
 
     private void btnClearMsgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearMsgActionPerformed
         txtResponse.setText("");
     }//GEN-LAST:event_btnClearMsgActionPerformed
 
     private void btnDIsconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDIsconnectActionPerformed
-        
-        if(null != appClientEndpoint){
+
+        if (null != appClientEndpoint) {
             appClientEndpoint.disconnect();
             btnConnect.setEnabled(true);
         }
@@ -191,11 +228,38 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtWSURLActionPerformed
 
+    private void cbSockJSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSockJSActionPerformed
+        if (null == appClientEndpoint) {
+            return;
+        }
+        boolean checked = ((JCheckBox) evt.getSource()).isSelected();
+        appClientEndpoint.withSockJS(checked);
+    }//GEN-LAST:event_cbSockJSActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        ThreadUtil.run(new Runnable() {
+            @Override
+            public void run() {
+                appClientEndpoint.connect();
+            }
+        });
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        ThreadUtil.run(new Runnable() {
+            @Override
+            public void run() {
+                appClientEndpoint.subsribe();
+            }
+        });
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     private void connect() {
         appClientEndpoint = new AppClientEndpoint(txtWSURL.getText());
         appClientEndpoint.setCustomMsgHandler(getMessageHandler());
-        
-        System.out.println("connecting to: "+txtWSURL.getText());
+        appClientEndpoint.withSockJS(cbSockJS.isSelected());
+
+        System.out.println("connecting to: " + txtWSURL.getText());
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
@@ -246,6 +310,9 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnDIsconnect;
     private javax.swing.JButton btnSend;
+    private javax.swing.JCheckBox cbSockJS;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField txtInput;
@@ -256,8 +323,8 @@ public class MainForm extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void updateSessionId(Object rawMessage) {
-        String pureID =  rawMessage.toString().replace("[ID]", "");
-        txtSessionId.setText("SESSION ID: " +pureID);
+        String pureID = rawMessage.toString().replace("[ID]", "");
+        txtSessionId.setText("SESSION ID: " + pureID);
         clientID = pureID;
         txtResponse.setText("Your ID:" + rawMessage);
     }
@@ -271,8 +338,8 @@ public class MainForm extends javax.swing.JFrame {
         msgContent += "\n" + message.getMessage();
         txtResponse.setText(oldText + "\n" + String.valueOf(msgContent));
     }
-    
-     private void showPlainMessage(Object payload) {
+
+    private void showPlainMessage(Object payload) {
         String message = payload.toString();
 
         String oldText = txtResponse.getText();
@@ -288,12 +355,12 @@ public class MainForm extends javax.swing.JFrame {
             //Recently Connected
             if (payload instanceof String && payload.toString().startsWith("[ID]")) {
                 updateSessionId(payload);
-            }else{
+            } else {
                 showPlainMessage(payload);
             }
             return;
         }
-        
+
         updateMessage(payload);
     }
 
@@ -305,7 +372,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         };
     }
-    
+
     private void sendMessage() {
         String destination = txtMessageTo.getText();
         String message = txtInput.getText();
