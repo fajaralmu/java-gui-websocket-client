@@ -78,16 +78,16 @@ public class AppClientEndpoint {
 
     /**
      * for SockJS only
-     *
-     * @param wsClientId
+     * 
      */
     public void subscribe() {
         if (!withSockJS) {
             System.out.println("Not Sock JS");
+            MyDialog.info("Subscribe is for SockJS!");
             return;
         }
         System.out.println("Subscribe wsClientId: " + sockJsId); 
-        String template = "[\"SUBSCRIBE\\nid:sub-0\\ndestination:/wsResp/chats/" + sockJsId + "\\n\\n\\u0000\"]";
+        String template = "[\"SUBSCRIBE\\nid:sub-"+StringUtil.randomNumber(100, 900)+"\\ndestination:/wsResp/chats/" + sockJsId + "\\n\\n\\u0000\"]";
         sessionSend(template);
 
     }

@@ -16,7 +16,10 @@ public class StringUtil {
     static final Random RANDOM = new Random();
     
     public static String randomNumber(){
-        return String.valueOf(RANDOM.nextInt(999)+100);
+        return String.valueOf(RANDOM.nextInt(899)+100);
+    }
+      public static String randomNumber(int min, int max){
+        return String.valueOf(RANDOM.nextInt(max)+min);
     }
 
     public static String randomUUID() {
