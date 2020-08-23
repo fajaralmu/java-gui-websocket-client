@@ -37,6 +37,7 @@ public class AppClientEndpoint {
     private Session thisSession;
     private CustomMsgHandler customMsgHandler;
     private final String wsURL;
+    private String sockJsId;
     private boolean withSockJS = false;
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
@@ -45,16 +46,21 @@ public class AppClientEndpoint {
         this.wsURL = wsURL;
     }
 
-    public void withSockJS(boolean b) {
+    public void withSockJS(boolean b, String sockJsId) {
         withSockJS = b;
+        this.sockJsId = sockJsId;
     }
 
     public void setCustomMsgHandler(CustomMsgHandler h) {
         this.customMsgHandler = h;
     }
 
-    public String getSessionId() {
-        return thisSession.getId();
+    public String getClientId() {
+        if (withSockJS) {
+            return sockJsId;
+        } else {
+            return thisSession.getId();
+        }
     }
 
     static String normalize(String payload) {
@@ -64,36 +70,30 @@ public class AppClientEndpoint {
     }
 
     public void connect() {
-        System.out.println("Connect");
-        try {
-            String template = "[\"CONNECT\\naccept-version:1.1,1.0\\nheart-beat:10000,10000\\n\\n\\u0000\"]";
-            thisSession.getBasicRemote().sendText(template);
-        } catch (IOException ex) {
-            Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("Connecting...");
+        String template = "[\"CONNECT\\naccept-version:1.1,1.0\\nheart-beat:10000,10000\\n\\n\\u0000\"]";
+        sessionSend(template);
 
     }
 
     /**
      * for SockJS only
-     * @param wsClientId 
+     *
+     * @param wsClientId
      */
-    public void subscribe(String wsClientId) {
-        if(!withSockJS){
+    public void subscribe() {
+        if (!withSockJS) {
             System.out.println("Not Sock JS");
             return;
         }
-        System.out.println("Subscribe wsClientId: "+wsClientId);
-        try {
-            String template = "[\"SUBSCRIBE\\nid:sub-0\\ndestination:/wsResp/chats/"+wsClientId+"\\n\\n\\u0000\"]";
-            thisSession.getBasicRemote().sendText(template);
-        } catch (IOException ex) {
-            Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("Subscribe wsClientId: " + sockJsId); 
+        String template = "[\"SUBSCRIBE\\nid:sub-0\\ndestination:/wsResp/chats/" + sockJsId + "\\n\\n\\u0000\"]";
+        sessionSend(template);
+
     }
 
     private String sockJsPayload(String message, String destination) {
-        String payload = MessageMapper.constructMessage(thisSession, destination, message);
+        String payload = MessageMapper.constructMessage(getClientId(), destination, message);
         try {
             payload = MessageMapper.OBJECT_MAPPER.writeValueAsString(payload);
             payload = normalize(payload);
@@ -108,15 +108,21 @@ public class AppClientEndpoint {
     }
 
     public void sendMessage(String message, String destination) {
+
+        String payload;
+        if (withSockJS) {
+            payload = sockJsPayload(message, destination);
+        } else {
+            payload = MessageMapper.constructMessage(getClientId(), destination, message);
+        }
+        sessionSend(payload);
+
+    }
+
+    private void sessionSend(String text) {
         try {
-            String payload;
-            if (withSockJS) {
-                payload = sockJsPayload(message, destination);
-            } else {
-                payload = MessageMapper.constructMessage(thisSession, destination, message);
-            }
-            thisSession.getBasicRemote().sendText(payload);
-        } catch (Exception ex) {
+            thisSession.getBasicRemote().sendText(text);
+        } catch (IOException ex) {
             Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -168,7 +174,7 @@ public class AppClientEndpoint {
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
 
-        logger.info(String.format("Session %s close because of %s", session.getId(), closeReason)); 
+        logger.info(String.format("Session %s close because of %s", session.getId(), closeReason));
         latch.countDown();
 
     }
@@ -188,15 +194,13 @@ public class AppClientEndpoint {
 
             throw new RuntimeException(e);
 
-        } 
+        }
     }
 
     public void disconnect() {
-        try {
-            thisSession.getBasicRemote().sendText("quit");
-        } catch (IOException ex) {
-            Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+        sessionSend("quit");
+
     }
 
 //    @Override
@@ -204,4 +208,7 @@ public class AppClientEndpoint {
 //        System.out.println("On Open: " + arg1.getUserProperties());
 //        this.onOpen(arg0);
 //    }
+    public boolean isWithSockJs() {
+        return withSockJS;
+    }
 }

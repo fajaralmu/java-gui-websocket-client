@@ -6,11 +6,12 @@
 package com.fajar.wsclient.gui;
 
 import com.fajar.wsclient.dto.Message;
+import com.fajar.wsclient.dto.MessageMapper;
 import com.fajar.wsclient.handler.CustomMsgHandler;
 import com.fajar.wsclient.process.AppClientEndpoint;
 import com.fajar.wsclient.process.StringUtil;
 import com.fajar.wsclient.process.ThreadUtil;
-import java.util.UUID;
+import java.awt.Rectangle;
 import javax.swing.JCheckBox;
 
 /**
@@ -200,14 +201,13 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-        // ALTERNATIVE: ws://localhost:8080/dormactivity/realtime-app/{NUMERIC}/{UNIQUE_ID}/websocket
-        // AND :ws://localhost:8025/websockets/chat
-        // example: localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket
+
         try {
             register();
             btnRegister.setEnabled(false);
             btnDIsconnect.setEnabled(true);
             btnConnect.setEnabled(true);
+            cbSockJS.setEnabled(false);
         } catch (Exception e) {
 
         }
@@ -243,8 +243,8 @@ public class MainForm extends javax.swing.JFrame {
         if (null == appClientEndpoint) {
             return;
         }
-        boolean checked = ((JCheckBox) evt.getSource()).isSelected();
-        appClientEndpoint.withSockJS(checked);
+//        boolean checked = ((JCheckBox) evt.getSource()).isSelected();
+//        appClientEndpoint.withSockJS(checked);
     }//GEN-LAST:event_cbSockJSActionPerformed
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
@@ -261,7 +261,7 @@ public class MainForm extends javax.swing.JFrame {
         ThreadUtil.run(new Runnable() {
             @Override
             public void run() {
-                appClientEndpoint.subscribe(wsClientId);
+                appClientEndpoint.subscribe();
                 btnSend.setEnabled(true);
             }
         });
@@ -271,26 +271,31 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSessionIdActionPerformed
 
+    /**
+     * Websocket URL ALTERNATIVE
+     * ws://localhost:8080/dormactivity/realtime-app/{NUMERIC}/{UNIQUE_ID}/websocket
+     * AND ws://localhost:8025/websockets/chat example
+     * localhost:8080/dormactivity/realtime-app/12345/EL_FAJR_APP/websocket
+     */
     private void register() {
         String wsURL = txtWSURL.getText();
 
         if (cbSockJS.isSelected()) {
-            String sessionId = UUID.randomUUID().toString();
+            String sessionId = StringUtil.randomUUID();
             wsURL = wsURL + "/" + StringUtil.randomNumber() + "/" + sessionId + "/websocket";
+
+            appClientEndpoint = new AppClientEndpoint(wsURL);
+            appClientEndpoint.withSockJS(true, sessionId);
+
             updateSessionId(sessionId);
+        } else {
+            appClientEndpoint = new AppClientEndpoint(wsURL);
         }
 
-        appClientEndpoint = new AppClientEndpoint(wsURL);
         appClientEndpoint.setCustomMsgHandler(getMessageHandler());
-        appClientEndpoint.withSockJS(cbSockJS.isSelected());
 
         System.out.println("connecting to: " + wsURL);
-        ThreadUtil.run(new Runnable() {
-            @Override
-            public void run() {
-                appClientEndpoint.start();
-            }
-        });
+        ThreadUtil.run(appClientEndpoint::start);
 
     }
 
@@ -348,24 +353,42 @@ public class MainForm extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void updateSessionId(Object rawMessage) {
-        String pureID = rawMessage.toString().replace("[ID]", "");
-        txtSessionId.setText("SESSION ID: " + pureID);
-        wsClientId = pureID;
-        txtResponse.setText("Your ID:" + rawMessage);
+        String extractedId = rawMessage.toString().replace("[ID]", "");
+        wsClientId = extractedId;
+
+        txtSessionId.setText("SESSION ID: " + wsClientId);
+        txtResponse.setText("Your ID:" + wsClientId);
     }
 
-    private void updateMessage(Object payload) {
-        Message message = (Message) payload;
+    /**
+     *
+     * @param message
+     */
+    private void showMessage(Message message) {
 
         String oldText = txtResponse.getText();
-        String msgContent = "From: " + message.getMessageFrom();
+        String msgContent = "\n==============================\nFrom: " + message.getMessageFrom();
         msgContent += "\n" + message.getDate();
         msgContent += "\n" + message.getMessage();
-        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent));
+        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n==============================\n");
+    }
+
+    private boolean isWithSockJs() {
+        return appClientEndpoint.isWithSockJs();
+    }
+
+    private boolean isSockJsMessageResponse(String raw) {
+        return raw.startsWith("a[\"MESSAGE");
     }
 
     private void showPlainMessage(Object payload) {
         String message = payload.toString();
+
+        if (isWithSockJs() && isSockJsMessageResponse(message)) {
+            Message messageObj = MessageMapper.parseSockJsResponse(message);
+            showMessage(messageObj);
+            return;
+        }
 
         String oldText = txtResponse.getText();
         String msgContent = "---------------------------------------\n";
@@ -387,7 +410,7 @@ public class MainForm extends javax.swing.JFrame {
             return;
         }
 
-        updateMessage(payload);
+        showMessage((Message) payload);
     }
 
     private CustomMsgHandler getMessageHandler() {

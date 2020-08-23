@@ -31,11 +31,34 @@ public class MessageMapper {
         }
     }
 
-    public static String constructMessage(Session session, String destination, String msg) {
+    public static String constructMessage(String id, String destination, String msg) {
 
-        Message message = new Message(destination, session.getId(), msg, new Date());
+        Message message = new Message(destination,id, msg, new Date());
         return messageAsString(message);
 
+    }
+
+    static final String EXAMPLE_RAW_MSG = "a[\"MESSAGE\\ndestination:/wsResp/chats/184166bd-1c19-48a0-a195-4cee810c8b66\\ncontent-type:application/json;charset=UTF-8\\nsubscription:sub-0\\nmessage-id:184166bd-1c19-48a0-a195-4cee810c8b66-10\\ncontent-length:145\\n\\n{\\\"messageTo\\\":\\\"184166bd-1c19-48a0-a195-4cee810c8b66\\\",\\\"messageFrom\\\":\\\"afaf410b-7ed5-4f8e-8011-a4fead733fd0\\\",\\\"message\\\":\\\"sdsdsd\\\",\\\"date\\\":1598144649057}\\u0000\"]";
+
+    public static void main(String[] args) throws Exception {
+        parseSockJsResponse(EXAMPLE_RAW_MSG);
+    }
+    //a["MESSAGE\ndestination:/wsResp/chats/184166bd-1c19-48a0-a195-4cee810c8b66\ncontent-type:application/json;charset=UTF-8\nsubscription:sub-0\nmessage-id:184166bd-1c19-48a0-a195-4cee810c8b66-10\ncontent-length:145\n\n{\"messageTo\":\"184166bd-1c19-48a0-a195-4cee810c8b66\",\"messageFrom\":\"afaf410b-7ed5-4f8e-8011-a4fead733fd0\",\"message\":\"sdsdsd\",\"date\":1598144649057}\u0000"]
+
+    public static Message parseSockJsResponse(String rawMessage) {
+        Message message = new Message();
+        int firstCurlyBraces = rawMessage.indexOf("{");
+        rawMessage = rawMessage.substring(firstCurlyBraces, rawMessage.length());
+        rawMessage = rawMessage.replace("\\u0000\"]", "");
+        rawMessage = rawMessage.replace("\\\"", "\"");
+        try {
+            message = OBJECT_MAPPER.readValue(rawMessage, Message.class);
+        } catch (Exception ex) {
+            System.out.println("Error parsing message");
+            ex.printStackTrace();
+        }
+
+        return message;
     }
 
 }

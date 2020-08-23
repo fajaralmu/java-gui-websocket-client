@@ -6,6 +6,7 @@
 package com.fajar.wsclient.process;
 
 import java.util.Random;
+import java.util.UUID;
 
 /**
  *
@@ -16,6 +17,10 @@ public class StringUtil {
     
     public static String randomNumber(){
         return String.valueOf(RANDOM.nextInt(999)+100);
+    }
+
+    public static String randomUUID() {
+       return UUID.randomUUID().toString();
     }
     
 }
