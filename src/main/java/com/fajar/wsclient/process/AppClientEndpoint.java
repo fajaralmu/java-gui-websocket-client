@@ -194,8 +194,14 @@ public class AppClientEndpoint {
     }
 
     public void disconnect() {
-
-        sessionSend("quit");
+        if(MyDialog.confirm(null, "Want to Disconnect?")){
+            if(withSockJS){
+                sessionSend("[\"DISCONNECT\\n\\n\\u0000\"]");
+            }else{
+                sessionSend("quit");
+            }
+              
+        } 
 
     }
 
