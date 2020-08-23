@@ -11,9 +11,7 @@ import com.fajar.wsclient.handler.CustomMsgHandler;
 import com.fajar.wsclient.process.AppClientEndpoint;
 import com.fajar.wsclient.process.StringUtil;
 import com.fajar.wsclient.process.ThreadUtil;
-import java.awt.Rectangle;
 import java.util.Date;
-import javax.swing.JCheckBox;
 
 /**
  *
@@ -29,6 +27,7 @@ public class MainForm extends javax.swing.JFrame {
      */
     public MainForm() {
         initComponents();
+       
     }
 
     /**
@@ -44,7 +43,6 @@ public class MainForm extends javax.swing.JFrame {
         txtInput = new javax.swing.JTextField();
         btnSend = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
         txtResponse = new javax.swing.JTextArea();
         txtMessageTo = new javax.swing.JTextField();
         btnClearMsg = new javax.swing.JButton();
@@ -54,6 +52,8 @@ public class MainForm extends javax.swing.JFrame {
         btnConnect = new javax.swing.JButton();
         btnSubscribe = new javax.swing.JButton();
         txtSessionId = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jEditorPane1 = new javax.swing.JEditorPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
@@ -75,9 +75,7 @@ public class MainForm extends javax.swing.JFrame {
 
         txtResponse.setColumns(20);
         txtResponse.setRows(5);
-        jScrollPane1.setViewportView(txtResponse);
-
-        jScrollPane2.setViewportView(jScrollPane1);
+        jScrollPane2.setViewportView(txtResponse);
 
         txtMessageTo.setText("Message To ");
 
@@ -132,6 +130,8 @@ public class MainForm extends javax.swing.JFrame {
                 txtSessionIdActionPerformed(evt);
             }
         });
+
+        jScrollPane3.setViewportView(jEditorPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -343,8 +343,9 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnSend;
     private javax.swing.JButton btnSubscribe;
     private javax.swing.JCheckBox cbSockJS;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextField txtInput;
     private javax.swing.JTextField txtMessageTo;
     private javax.swing.JTextArea txtResponse;
@@ -391,7 +392,7 @@ public class MainForm extends javax.swing.JFrame {
         }
 
         String oldText = txtResponse.getText();
-        String msgContent = "---------------------------------------\n";
+        String msgContent = "\n---------------------------------------\n";
         msgContent += "PLAIN RESPONSE";
         msgContent += "\n" + message;
         txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
