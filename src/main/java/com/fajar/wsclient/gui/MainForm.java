@@ -395,7 +395,7 @@ public class MainForm extends javax.swing.JFrame {
         String extractedId = rawMessage.toString().replace("[ID]", "");
         wsClientId = extractedId;
 
-        txtSessionId.setText("SESSION ID: " + wsClientId);
+        txtSessionId.setText(wsClientId);
         showMessage("Your ID:" + wsClientId);
     }
 
@@ -426,19 +426,29 @@ public class MainForm extends javax.swing.JFrame {
         int messageComponentWidth = 250;
         int yPos = getNextYPos();
 
-        PanelRequest request = PanelRequest.autoPanelNonScroll(1, messageComponentWidth, 5, Color.yellow);
-
+       Color color;
         Object[] messageComps;
 
         if (payload instanceof Message) {
             Message message = (Message) payload;
-            messageComps = new Object[3];
-            messageComps[0] = messageContentLabel("From: " + message.getMessageFrom());
-            messageComps[1] = messageContentLabel("Date: " + message.getDate());
-            messageComps[2] = messageContentLabel(message.getMessage());
+            
+            Component  date = messageContentLabel("Date: " + message.getDate());
+            Component content = messageContentLabel("<html><strong>"+message.getMessage()+"</strong></html>");
+            Component messageBody = ComponentBuilder.buildVerticallyInlineComponent(300, date, content); 
+            messageBody.setBackground(Color.lightGray);
+            
+            messageComps = new Object[2];
+            messageComps[0] = messageContentLabel("<html><strong>" + message.getMessageFrom()+"</strong></html>");
+            messageComps[1] = messageBody;
+            
+            //same as background
+            color = panelMessages.getBackground();
         } else {
             messageComps = new Object[]{messageContentLabel(String.valueOf(payload))};
+            
+            color = Color.orange;
         }
+        PanelRequest request = PanelRequest.autoPanelNonScroll(1, messageComponentWidth, 5, color);
 
         JPanel jpanel = ComponentBuilder.buildPanelV2(request, messageComps);
         jpanel.setLocation(5, yPos);
@@ -464,8 +474,7 @@ public class MainForm extends javax.swing.JFrame {
         }
 
 //        String oldText = txtResponse.getText();
-        String msgContent = "PLAIN RESPONSE";
-        msgContent += "\n" + message;
+        String msgContent = "[System]: " + message; 
         showMessage(msgContent);
 //        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
     }
