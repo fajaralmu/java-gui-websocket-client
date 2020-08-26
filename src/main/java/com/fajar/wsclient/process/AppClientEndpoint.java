@@ -39,6 +39,7 @@ public class AppClientEndpoint {
     private static CountDownLatch latch;
     private final String wsURL;
     private final boolean withSockJS;
+    private boolean subscribed;
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -91,6 +92,10 @@ public class AppClientEndpoint {
         if (!withSockJS) {
             System.out.println("Not Sock JS");
             MyDialog.info("Subscribe is for SockJS");
+            return;
+        }
+        if(subscribed){
+            System.out.println("Client has subscribed");
             return;
         }
         System.out.println("Subscribe wsClientId: " + sockJsId);
