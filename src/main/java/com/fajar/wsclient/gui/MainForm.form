@@ -24,7 +24,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Have Fun!"/>
+            <Property name="text" type="java.lang.String" value="Have Fun! &#x263a;"/>
           </Properties>
         </Menu>
       </SubComponents>

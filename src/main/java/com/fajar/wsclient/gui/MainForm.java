@@ -186,7 +186,7 @@ public class MainForm extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Have Fun!");
+        jMenu2.setText("Have Fun! ☺");
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -429,7 +429,7 @@ public class MainForm extends javax.swing.JFrame {
         wsClientId = extractedId;
         
         txtSessionId.setText(wsClientId);
-        showMessage("Your ID:" + wsClientId);
+        showMessage("[System]: Your session id is " + wsClientId);
     }
 
     /**
@@ -453,30 +453,37 @@ public class MainForm extends javax.swing.JFrame {
         
         int messageComponentWidth = 250;
         int yPos = getNextYPos();
-        
-        Color color;
+         
         Object[] messageComps;
         
         if (payload instanceof Message) {
             Message message = (Message) payload;
+            Color msgColor;
+            
+            boolean isUserMessage = message.getMessageFrom() .equals(appClientEndpoint.getClientId());
+            if(isUserMessage){
+                message.setMessageFrom("You");
+                msgColor = new Color(125, 255,255);
+            }else{
+                 msgColor = Color.LIGHT_GRAY;
+            }
             
             Component date = messageContentLabel("Date: " + message.getDate());
             Component content = messageContentLabel("<html><strong>" + message.getMessage() + "</strong></html>");
             Component messageBody = ComponentBuilder.buildVerticallyInlineComponent(300, date, content);
-            messageBody.setBackground(Color.lightGray);
+            messageBody.setBackground(msgColor);
             
             messageComps = new Object[2];
             messageComps[0] = messageContentLabel("<html><strong>" + message.getMessageFrom() + "</strong></html>");
-            messageComps[1] = messageBody;
-
-            //same as background
-            color = panelMessages.getBackground();
+            messageComps[1] = messageBody; 
+           
         } else {
-            messageComps = new Object[]{messageContentLabel(String.valueOf(payload))};
-            
-            color = Color.orange;
+            JLabel plainMessage = messageContentLabel(String.valueOf(payload));
+            plainMessage.setFont(new Font("Consolas", Font.PLAIN, 12));
+            plainMessage.setForeground(Color.white);
+            messageComps = new Object[]{plainMessage}; 
         }
-        PanelRequest request = PanelRequest.autoPanelNonScroll(1, messageComponentWidth, 5, color);
+        PanelRequest request = PanelRequest.autoPanelNonScroll(1, messageComponentWidth, 5, panelMessages.getBackground());
         
         JPanel messagePanel = ComponentBuilder.buildPanelV2(request, messageComps);
         messagePanel.setLocation(5, yPos);
@@ -542,7 +549,7 @@ public class MainForm extends javax.swing.JFrame {
     }
     
     private void showUserMessage(String rawMessage, String destination) {
-        Message message = new Message(destination, "You", rawMessage, new Date());
+        Message message = new Message(destination, appClientEndpoint.getClientId(), rawMessage, new Date());
         this.showMessage(message);
     }
     
