@@ -12,6 +12,8 @@ import com.fajar.wsclient.handler.MyCallback;
 import com.fajar.wsclient.util.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,17 +31,18 @@ import org.glassfish.tyrus.client.ClientManager;
  * @author Republic Of Gamers
  */
 @ClientEndpoint
-public class AppClientEndpoint {
-    //extends Endpoint
+public class AppClientEndpoint /*extends Endpoint */ {
+
+    private static CountDownLatch latch;
 
     private Session thisSession;
     private CustomMsgHandler customMsgHandler;
 
     private final String sockJsId;
-    private static CountDownLatch latch;
     private final String wsURL;
     private final boolean withSockJS;
-    private boolean subscribed;
+    private final Map<String, Object> subscribedTopics = new HashMap<>();
+    private final String subscriptionPrefix = "wsResp";
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -74,33 +77,35 @@ public class AppClientEndpoint {
     }
 
     public void connect() {
-        if(!withSockJS){
+        if (!withSockJS) {
             System.out.println("Not Sock JS");
             MyDialog.info("connect is for SockJS");
             return;
         }
         System.out.println("Connecting...");
         String template = "[\"CONNECT\\naccept-version:1.1,1.0\\nheart-beat:10000,10000\\n\\n\\u0000\"]";
-        sessionSend(template); 
+        sessionSend(template);
     }
 
     /**
      * for SockJS only
      *
      */
-    public void subscribe() {
+    public void subscribe(String path) {
         if (!withSockJS) {
             System.out.println("Not Sock JS");
             MyDialog.info("Subscribe is for SockJS");
             return;
         }
-        if(subscribed){
-            System.out.println("Client has subscribed");
+        if (subscribedTopics.get(path) != null) {
+            System.out.println("Client has subscribed " + path);
             return;
         }
-        System.out.println("Subscribe wsClientId: " + sockJsId);
-        String template = "[\"SUBSCRIBE\\nid:sub-" + StringUtil.randomNumber(100, 900) + "\\ndestination:/wsResp/chats/" + sockJsId + "\\n\\n\\u0000\"]";
+        System.out.println("Subscribe to topic: " + subscriptionPrefix + "/" + path);
+
+        String template = "[\"SUBSCRIBE\\nid:sub-" + StringUtil.randomNumber(100, 900) + "\\ndestination:/" + subscriptionPrefix + "/" + path + "/" + sockJsId + "\\n\\n\\u0000\"]";
         sessionSend(template);
+        subscribedTopics.put(path, "TOPIC");
 
     }
 
@@ -128,7 +133,7 @@ public class AppClientEndpoint {
             payload = MessageMapper.constructMessage(getClientId(), destination, message);
         }
         boolean messageSent = sessionSend(payload);
-        if(messageSent){
+        if (messageSent) {
             callback.callback(message);
         }
 
@@ -211,14 +216,14 @@ public class AppClientEndpoint {
     }
 
     public void disconnect() {
-        if(MyDialog.confirm(null, "Want to Disconnect?")){
-            if(withSockJS){
+        if (MyDialog.confirm(null, "Want to Disconnect?")) {
+            if (withSockJS) {
                 sessionSend("[\"DISCONNECT\\n\\n\\u0000\"]");
-            }else{
+            } else {
                 sessionSend("quit");
             }
-              
-        } 
+
+        }
 
     }
 

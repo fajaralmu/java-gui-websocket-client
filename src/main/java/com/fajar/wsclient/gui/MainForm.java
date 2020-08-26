@@ -327,7 +327,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnSubscribeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubscribeActionPerformed
         ThreadUtil.run(() -> {
-            appClientEndpoint.subscribe();
+            appClientEndpoint.subscribe("chats");
             btnSend.setEnabled(true);
         });
     }//GEN-LAST:event_btnSubscribeActionPerformed
