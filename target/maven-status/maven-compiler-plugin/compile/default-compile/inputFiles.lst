@@ -4,6 +4,7 @@ D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\process\AppClient
 D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\dto\MessageMapper.java
 D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\Appl.java
 D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\process\MyDialog.java
+D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\handler\MyCallback.java
 D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\dto\Message.java
 D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\handler\CustomMsgHandler.java
 D:\Development\Fajar\WSClient\src\main\java\com\fajar\wsclient\process\ThreadUtil.java

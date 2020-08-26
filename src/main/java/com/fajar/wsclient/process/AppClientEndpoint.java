@@ -8,6 +8,8 @@ package com.fajar.wsclient.process;
 import com.fajar.wsclient.dto.Message;
 import com.fajar.wsclient.dto.MessageMapper;
 import com.fajar.wsclient.handler.CustomMsgHandler;
+import com.fajar.wsclient.handler.MyCallback;
+import com.fajar.wsclient.util.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
@@ -107,7 +109,7 @@ public class AppClientEndpoint {
         return sendingTemplate;
     }
 
-    public void sendMessage(String message, String destination) {
+    public void sendMessage(String message, String destination, MyCallback<String> callback) {
 
         String payload;
         if (withSockJS) {
@@ -115,16 +117,21 @@ public class AppClientEndpoint {
         } else {
             payload = MessageMapper.constructMessage(getClientId(), destination, message);
         }
-        sessionSend(payload);
+        boolean messageSent = sessionSend(payload);
+        if(messageSent){
+            callback.callback(message);
+        }
 
     }
 
-    private void sessionSend(String text) {
+    private boolean sessionSend(String text) {
         try {
             thisSession.getBasicRemote().sendText(text);
+            return true;
         } catch (Exception ex) {
             MyDialog.error(ex.getMessage());
             Logger.getLogger(AppClientEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 

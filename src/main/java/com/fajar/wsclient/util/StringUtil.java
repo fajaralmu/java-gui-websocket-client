@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.fajar.wsclient.process;
+package com.fajar.wsclient.util;
 
 import java.util.Random;
 import java.util.UUID;
@@ -25,5 +25,36 @@ public class StringUtil {
     public static String randomUUID() {
        return UUID.randomUUID().toString();
     }
+    
+    public static String beautifyNominal(Object Int) {
+		if(Int == null) {
+			return "0";
+		}
+		String[] rawNominal = Int.toString().split("\\.");
+		String nominal = rawNominal[0];
+		String result = "";
+		if (nominal.length() > 3) {
+			int nol = 0;
+			for (int i = nominal.length() - 1; i > 0; i--) {
+				nol++;
+				result = nominal.charAt(i) + result;
+				if (nol == 3) {
+					result = "." + result;
+					nol = 0;
+				}
+
+			}
+			result = nominal.charAt(0) + result;
+		} else {
+			result = Int.toString();
+		}
+
+		if (rawNominal.length > 1) {
+			result = result + "," + rawNominal[1];
+		}
+
+		return result;
+	}
+	
     
 }
