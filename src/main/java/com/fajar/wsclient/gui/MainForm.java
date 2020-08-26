@@ -12,6 +12,7 @@ import com.fajar.wsclient.dto.Message;
 import com.fajar.wsclient.dto.MessageMapper;
 import com.fajar.wsclient.handler.CustomMsgHandler;
 import com.fajar.wsclient.process.AppClientEndpoint;
+import com.fajar.wsclient.process.MyDialog;
 import com.fajar.wsclient.util.StringUtil;
 import com.fajar.wsclient.util.ThreadUtil;
 import java.awt.Color;
@@ -28,16 +29,17 @@ import javax.swing.SwingConstants;
  * @author Republic Of Gamers
  */
 public class MainForm extends javax.swing.JFrame {
-
+    
     private AppClientEndpoint appClientEndpoint;
     private String wsClientId;
+    private Guide guideDialog;
 
     /**
      * Creates new form Main
      */
     public MainForm() {
         initComponents();
-
+        guideDialog = new Guide(this);
     }
 
     /**
@@ -65,6 +67,10 @@ public class MainForm extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jEditorPane1 = new javax.swing.JEditorPane();
         jLabel1 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        menuShowGuide = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Test WS Client");
@@ -77,8 +83,9 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        btnSend.setBackground(new java.awt.Color(0, 255, 51));
+        btnSend.setBackground(new java.awt.Color(0, 204, 102));
         btnSend.setText("Send");
+        btnSend.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnSend.setEnabled(false);
         btnSend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -137,7 +144,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        btnConnect.setBackground(new java.awt.Color(102, 204, 255));
+        btnConnect.setBackground(new java.awt.Color(204, 204, 204));
         btnConnect.setText("Connect");
         btnConnect.setEnabled(false);
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
@@ -146,7 +153,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        btnSubscribe.setBackground(new java.awt.Color(102, 204, 255));
+        btnSubscribe.setBackground(new java.awt.Color(204, 204, 204));
         btnSubscribe.setText("Subscribe");
         btnSubscribe.setEnabled(false);
         btnSubscribe.addActionListener(new java.awt.event.ActionListener() {
@@ -165,6 +172,24 @@ public class MainForm extends javax.swing.JFrame {
         jScrollPane3.setViewportView(jEditorPane1);
 
         jLabel1.setText("Server :");
+
+        jMenu1.setText("Option");
+
+        menuShowGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
+        menuShowGuide.setText("Guide");
+        menuShowGuide.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuShowGuideActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuShowGuide);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Have Fun!");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -192,15 +217,15 @@ public class MainForm extends javax.swing.JFrame {
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGroup(layout.createSequentialGroup()
                                             .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addGap(18, 18, 18)
-                                            .addComponent(btnSend))
-                                        .addComponent(txtMessageTo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGap(37, 37, 37)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(btnConnect)
-                                        .addComponent(btnSubscribe)))
+                                            .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(btnSubscribe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnConnect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(jLabel1)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -241,7 +266,7 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-
+        
         try {
             register();
             btnRegister.setEnabled(false);
@@ -249,24 +274,24 @@ public class MainForm extends javax.swing.JFrame {
             btnConnect.setEnabled(true);
             cbSockJS.setEnabled(false);
         } catch (Exception e) {
-
+            
         }
 
     }//GEN-LAST:event_btnRegisterActionPerformed
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-
+        
         if (null == appClientEndpoint) {
             return;
         }
         sendMessage();
     }//GEN-LAST:event_btnSendActionPerformed
-
+    
 
     private void btnClearMsgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearMsgActionPerformed
         clearMessages();
     }//GEN-LAST:event_btnClearMsgActionPerformed
-
+    
     private void clearMessages() {
         //        txtResponse.setText("");
         panelMessages.removeAll();
@@ -274,7 +299,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     private void btnDIsconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDIsconnectActionPerformed
-
+        
         if (null != appClientEndpoint) {
             appClientEndpoint.disconnect();
             btnRegister.setEnabled(true);
@@ -311,6 +336,10 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSessionIdActionPerformed
 
+    private void menuShowGuideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuShowGuideActionPerformed
+        guideDialog.setVisible(true);
+    }//GEN-LAST:event_menuShowGuideActionPerformed
+
     /**
      * Web socket URL ALTERNATIVE
      * ws://localhost:8080/dormactivity/realtime-app/{NUMERIC}/{UNIQUE_ID}/websocket
@@ -319,23 +348,23 @@ public class MainForm extends javax.swing.JFrame {
      */
     private void register() {
         String wsURL = txtWSURL.getText();
-
+        
         if (cbSockJS.isSelected()) {
             String sessionId = StringUtil.randomUUID();
             wsURL = wsURL + "/" + StringUtil.randomNumber() + "/" + sessionId + "/websocket";
-
+            
             appClientEndpoint = new AppClientEndpoint(wsURL, true, sessionId);
-
+            
             updateSessionId(sessionId);
         } else {
             appClientEndpoint = new AppClientEndpoint(wsURL);
         }
-
+        
         appClientEndpoint.setCustomMsgHandler(getMessageHandler());
-
+        
         System.out.println("connecting to: " + wsURL);
         ThreadUtil.run(appClientEndpoint::start);
-
+        
     }
 
     /**
@@ -382,8 +411,12 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JCheckBox cbSockJS;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JMenuItem menuShowGuide;
     private javax.swing.JPanel panelMessages;
     private javax.swing.JTextField txtInput;
     private javax.swing.JTextField txtMessageTo;
@@ -394,7 +427,7 @@ public class MainForm extends javax.swing.JFrame {
     private void updateSessionId(Object rawMessage) {
         String extractedId = rawMessage.toString().replace("[ID]", "");
         wsClientId = extractedId;
-
+        
         txtSessionId.setText(wsClientId);
         showMessage("Your ID:" + wsClientId);
     }
@@ -405,42 +438,37 @@ public class MainForm extends javax.swing.JFrame {
      */
     private void showMessage(Object payload) {
         System.out.println("showMessage payload type: " + payload.getClass());
-//        String oldText = txtResponse.getText();
-//        String msgContent = "\n==============================\nFrom: " + message.getMessageFrom();
-//        msgContent += "\n" + message.getDate();
-//        msgContent += "\n" + message.getMessage();
-//        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
         JPanel panel = createMessageComponent(payload);
         panelMessages.add(panel);
         panelMessages.repaint();
     }
-
+    
     private JLabel messageContentLabel(String content) {
         JLabel label = ComponentBuilder.label(content, SwingConstants.LEFT);
         label.setFont(new Font("Arial", Font.PLAIN, 13));
         return label;
     }
-
+    
     private JPanel createMessageComponent(Object payload) {
-
+        
         int messageComponentWidth = 250;
         int yPos = getNextYPos();
-
-       Color color;
+        
+        Color color;
         Object[] messageComps;
-
+        
         if (payload instanceof Message) {
             Message message = (Message) payload;
             
-            Component  date = messageContentLabel("Date: " + message.getDate());
-            Component content = messageContentLabel("<html><strong>"+message.getMessage()+"</strong></html>");
-            Component messageBody = ComponentBuilder.buildVerticallyInlineComponent(300, date, content); 
+            Component date = messageContentLabel("Date: " + message.getDate());
+            Component content = messageContentLabel("<html><strong>" + message.getMessage() + "</strong></html>");
+            Component messageBody = ComponentBuilder.buildVerticallyInlineComponent(300, date, content);
             messageBody.setBackground(Color.lightGray);
             
             messageComps = new Object[2];
-            messageComps[0] = messageContentLabel("<html><strong>" + message.getMessageFrom()+"</strong></html>");
+            messageComps[0] = messageContentLabel("<html><strong>" + message.getMessageFrom() + "</strong></html>");
             messageComps[1] = messageBody;
-            
+
             //same as background
             color = panelMessages.getBackground();
         } else {
@@ -449,39 +477,37 @@ public class MainForm extends javax.swing.JFrame {
             color = Color.orange;
         }
         PanelRequest request = PanelRequest.autoPanelNonScroll(1, messageComponentWidth, 5, color);
-
-        JPanel jpanel = ComponentBuilder.buildPanelV2(request, messageComps);
-        jpanel.setLocation(5, yPos);
-        return jpanel;
-
+        
+        JPanel messagePanel = ComponentBuilder.buildPanelV2(request, messageComps);
+        messagePanel.setLocation(5, yPos);
+        return messagePanel;
+        
     }
-
+    
     private boolean isWithSockJs() {
         return appClientEndpoint.isWithSockJs();
     }
-
+    
     private boolean isSockJsMessageResponse(String raw) {
         return raw.startsWith("a[\"MESSAGE");
     }
-
+    
     private void showPlainMessage(Object payload) {
         String message = payload.toString();
-
+        
         if (isWithSockJs() && isSockJsMessageResponse(message)) {
             Message messageObj = MessageMapper.parseSockJsResponse(message);
             showMessage(messageObj);
             return;
         }
-
-//        String oldText = txtResponse.getText();
-        String msgContent = "[System]: " + message; 
+        
+        String msgContent = "[System]: " + message;
         showMessage(msgContent);
-//        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
     }
-
+    
     private void handleMessage(Object payload, AppClientEndpoint client) {
         System.out.println("handleOnMessage:" + payload);
-
+        
         if (!(payload instanceof Message)) {
             //Recently Connected
             if (payload instanceof String && payload.toString().startsWith("[ID]")) {
@@ -491,33 +517,38 @@ public class MainForm extends javax.swing.JFrame {
             }
             return;
         }
-
+        
         showMessage((Message) payload);
     }
-
+    
     private CustomMsgHandler getMessageHandler() {
         return this::handleMessage;
     }
-
+    
     private void sendMessage() {
         String destination = txtMessageTo.getText();
         String message = txtInput.getText();
-
+        
+        if (message == null || message.trim().equals("")) {
+            MyDialog.info("Cannot send empty message!");
+            return;
+        }
+        
         appClientEndpoint.sendMessage(message, destination, (String s) -> {
             showUserMessage(s, destination);
             txtInput.setText("");
         });
-
+        
     }
-
+    
     private void showUserMessage(String rawMessage, String destination) {
         Message message = new Message(destination, "You", rawMessage, new Date());
         this.showMessage(message);
     }
-
+    
     private int getNextYPos() {
         int margin = 5;
-
+        
         int totalHeight = margin;
         int maxWidth = panelMessages.getWidth();
         Component[] components = panelMessages.getComponents();
@@ -530,18 +561,15 @@ public class MainForm extends javax.swing.JFrame {
         updatePanelMessageDimension(maxWidth + 10, totalHeight + 300);
         return totalHeight;
     }
-
+    
     private void updatePanelMessageDimension(int maxWidth, int newHeight) {
-        System.out.println("updatePanelMessagesHeight: " + newHeight);
+        
         ComponentModifier.changeSize(panelMessages, maxWidth, newHeight);
-        System.out.println("panel message: " + panelMessages.getHeight());
-
-//        component.setPreferredSize(newDimension);
-//		component.setSize(newDimension);
+        
         panelMessages.setPreferredSize(new Dimension(panelMessages.getWidth(), panelMessages.getHeight()));
         jScrollPane2.setViewportView(panelMessages);
         jScrollPane2.validate();
         jScrollPane2.repaint();
-
+        
     }
 }

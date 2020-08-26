@@ -73,6 +73,11 @@ public class AppClientEndpoint {
     }
 
     public void connect() {
+        if(!withSockJS){
+            System.out.println("Not Sock JS");
+            MyDialog.info("connect is for SockJS");
+            return;
+        }
         System.out.println("Connecting...");
         String template = "[\"CONNECT\\naccept-version:1.1,1.0\\nheart-beat:10000,10000\\n\\n\\u0000\"]";
         sessionSend(template); 
@@ -85,7 +90,7 @@ public class AppClientEndpoint {
     public void subscribe() {
         if (!withSockJS) {
             System.out.println("Not Sock JS");
-            MyDialog.info("Subscribe is for SockJS!");
+            MyDialog.info("Subscribe is for SockJS");
             return;
         }
         System.out.println("Subscribe wsClientId: " + sockJsId);

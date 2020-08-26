@@ -1,11 +1,13 @@
 com\fajar\wsclient\components\ComponentBuilder.class
 com\fajar\wsclient\handler\CustomMsgHandler.class
 com\fajar\wsclient\components\BlankComponent.class
+com\fajar\wsclient\gui\Guide.class
 com\fajar\wsclient\gui\MainForm$2.class
 com\fajar\wsclient\components\ComponentBuilder$1.class
 com\fajar\wsclient\gui\MainForm$7.class
 com\fajar\wsclient\dto\Message.class
 com\fajar\wsclient\util\ThreadUtil.class
+com\fajar\wsclient\gui\MainForm$10.class
 com\fajar\wsclient\gui\MainForm.class
 com\fajar\wsclient\util\Log.class
 com\fajar\wsclient\gui\MainForm$5.class
