@@ -17,7 +17,9 @@ import com.fajar.wsclient.util.ThreadUtil;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.Date;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
@@ -26,7 +28,7 @@ import javax.swing.SwingConstants;
  * @author Republic Of Gamers
  */
 public class MainForm extends javax.swing.JFrame {
-    
+
     private AppClientEndpoint appClientEndpoint;
     private String wsClientId;
 
@@ -35,7 +37,7 @@ public class MainForm extends javax.swing.JFrame {
      */
     public MainForm() {
         initComponents();
-        
+
     }
 
     /**
@@ -239,7 +241,7 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-        
+
         try {
             register();
             btnRegister.setEnabled(false);
@@ -247,24 +249,24 @@ public class MainForm extends javax.swing.JFrame {
             btnConnect.setEnabled(true);
             cbSockJS.setEnabled(false);
         } catch (Exception e) {
-            
+
         }
 
     }//GEN-LAST:event_btnRegisterActionPerformed
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        
+
         if (null == appClientEndpoint) {
             return;
         }
         sendMessage();
     }//GEN-LAST:event_btnSendActionPerformed
-    
+
 
     private void btnClearMsgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearMsgActionPerformed
         clearMessages();
     }//GEN-LAST:event_btnClearMsgActionPerformed
-    
+
     private void clearMessages() {
         //        txtResponse.setText("");
         panelMessages.removeAll();
@@ -272,7 +274,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     private void btnDIsconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDIsconnectActionPerformed
-        
+
         if (null != appClientEndpoint) {
             appClientEndpoint.disconnect();
             btnRegister.setEnabled(true);
@@ -317,23 +319,23 @@ public class MainForm extends javax.swing.JFrame {
      */
     private void register() {
         String wsURL = txtWSURL.getText();
-        
+
         if (cbSockJS.isSelected()) {
             String sessionId = StringUtil.randomUUID();
             wsURL = wsURL + "/" + StringUtil.randomNumber() + "/" + sessionId + "/websocket";
-            
+
             appClientEndpoint = new AppClientEndpoint(wsURL, true, sessionId);
-            
+
             updateSessionId(sessionId);
         } else {
             appClientEndpoint = new AppClientEndpoint(wsURL);
         }
-        
+
         appClientEndpoint.setCustomMsgHandler(getMessageHandler());
-        
+
         System.out.println("connecting to: " + wsURL);
         ThreadUtil.run(appClientEndpoint::start);
-        
+
     }
 
     /**
@@ -392,7 +394,7 @@ public class MainForm extends javax.swing.JFrame {
     private void updateSessionId(Object rawMessage) {
         String extractedId = rawMessage.toString().replace("[ID]", "");
         wsClientId = extractedId;
-        
+
         txtSessionId.setText("SESSION ID: " + wsClientId);
         showMessage("Your ID:" + wsClientId);
     }
@@ -412,44 +414,49 @@ public class MainForm extends javax.swing.JFrame {
         panelMessages.add(panel);
         panelMessages.repaint();
     }
-    
+
+    private JLabel messageContentLabel(String content) {
+        JLabel label = ComponentBuilder.label(content, SwingConstants.LEFT);
+        label.setFont(new Font("Arial", Font.PLAIN, 13));
+        return label;
+    }
+
     private JPanel createMessageComponent(Object payload) {
-        
-        int messageComponentHeight = 100;
+
         int messageComponentWidth = 250;
         int yPos = getNextYPos();
-        
+
         PanelRequest request = PanelRequest.autoPanelNonScroll(1, messageComponentWidth, 5, Color.yellow);
-        
+
         Object[] messageComps;
-        
+
         if (payload instanceof Message) {
             Message message = (Message) payload;
             messageComps = new Object[3];
-            messageComps[0] = ComponentBuilder.label("From: " + message.getMessageFrom(), SwingConstants.LEFT);
-            messageComps[1] = ComponentBuilder.label("Date: " + message.getDate(), SwingConstants.LEFT);
-            messageComps[2] = ComponentBuilder.label(message.getMessage(), SwingConstants.LEFT);
+            messageComps[0] = messageContentLabel("From: " + message.getMessageFrom());
+            messageComps[1] = messageContentLabel("Date: " + message.getDate());
+            messageComps[2] = messageContentLabel(message.getMessage());
         } else {
-            messageComps = new Object[]{ComponentBuilder.label(String.valueOf(payload), SwingConstants.LEFT)};
+            messageComps = new Object[]{messageContentLabel(String.valueOf(payload))};
         }
-        
+
         JPanel jpanel = ComponentBuilder.buildPanelV2(request, messageComps);
         jpanel.setLocation(5, yPos);
         return jpanel;
-        
+
     }
-    
+
     private boolean isWithSockJs() {
         return appClientEndpoint.isWithSockJs();
     }
-    
+
     private boolean isSockJsMessageResponse(String raw) {
         return raw.startsWith("a[\"MESSAGE");
     }
-    
+
     private void showPlainMessage(Object payload) {
         String message = payload.toString();
-        
+
         if (isWithSockJs() && isSockJsMessageResponse(message)) {
             Message messageObj = MessageMapper.parseSockJsResponse(message);
             showMessage(messageObj);
@@ -462,10 +469,10 @@ public class MainForm extends javax.swing.JFrame {
         showMessage(msgContent);
 //        txtResponse.setText(oldText + "\n" + String.valueOf(msgContent) + "\n");
     }
-    
+
     private void handleMessage(Object payload, AppClientEndpoint client) {
         System.out.println("handleOnMessage:" + payload);
-        
+
         if (!(payload instanceof Message)) {
             //Recently Connected
             if (payload instanceof String && payload.toString().startsWith("[ID]")) {
@@ -475,54 +482,57 @@ public class MainForm extends javax.swing.JFrame {
             }
             return;
         }
-        
+
         showMessage((Message) payload);
     }
-    
+
     private CustomMsgHandler getMessageHandler() {
         return this::handleMessage;
     }
-    
+
     private void sendMessage() {
         String destination = txtMessageTo.getText();
         String message = txtInput.getText();
-        
+
         appClientEndpoint.sendMessage(message, destination, (String s) -> {
             showUserMessage(s, destination);
             txtInput.setText("");
         });
-        
+
     }
-    
+
     private void showUserMessage(String rawMessage, String destination) {
         Message message = new Message(destination, "You", rawMessage, new Date());
         this.showMessage(message);
     }
-    
+
     private int getNextYPos() {
         int margin = 5;
-        
+
         int totalHeight = margin;
+        int maxWidth = panelMessages.getWidth();
         Component[] components = panelMessages.getComponents();
         for (Component component : components) {
             totalHeight += component.getHeight() + margin;
+            if (maxWidth < component.getWidth()) {
+                maxWidth = component.getWidth();
+            }
         }
-        updatePanelMessagesHeight(totalHeight + 300);
+        updatePanelMessageDimension(maxWidth + 10, totalHeight + 300);
         return totalHeight;
     }
-    
-    private void updatePanelMessagesHeight(int newHeight) {
+
+    private void updatePanelMessageDimension(int maxWidth, int newHeight) {
         System.out.println("updatePanelMessagesHeight: " + newHeight);
-        ComponentModifier.changeSizeHeight(panelMessages, newHeight);
+        ComponentModifier.changeSize(panelMessages, maxWidth, newHeight);
         System.out.println("panel message: " + panelMessages.getHeight());
 
 //        component.setPreferredSize(newDimension);
 //		component.setSize(newDimension);
-
         panelMessages.setPreferredSize(new Dimension(panelMessages.getWidth(), panelMessages.getHeight()));
         jScrollPane2.setViewportView(panelMessages);
-        jScrollPane2.validate();        
+        jScrollPane2.validate();
         jScrollPane2.repaint();
-        
+
     }
 }
